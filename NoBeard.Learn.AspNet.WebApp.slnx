@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="NoBeard.Learn.AspNet.WebApp.API/NoBeard.Learn.AspNet.WebApp.API.csproj" />
+  <Project Path="NoBeard.Learn.AspNet.WebApp.Data/NoBeard.Learn.AspNet.WebApp.Data.csproj" Id="bbfef4f8-7b22-4a72-8b18-73fa38155d30" />
 </Solution>
