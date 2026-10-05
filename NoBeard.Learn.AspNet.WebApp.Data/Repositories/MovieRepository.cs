@@ -1,4 +1,5 @@
 ﻿using NoBeard.Learn.AspNet.WebApp.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
@@ -17,5 +18,24 @@ public sealed class MovieRepository(AppDbContext dbContext) : BaseRepository<Mov
 
         dbContext.Movies.Update(entity);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<Movie>> GetFilteredAsync(string name, bool ascending, int page, int pageSize)
+    {
+        var query = dbContext.Movies.AsQueryable(); // as IQueryable<Movie>;
+
+        // filtering
+        if (!string.IsNullOrEmpty(name))
+        {
+            query = query.Where(m => m.Name.Contains(name));
+        }
+
+        // sorting
+        query = ascending ? query.OrderBy(m => m.Name) : query.OrderByDescending(m => m.Name);
+
+        // paging
+        query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+        return await query.ToListAsync();
     }
 }

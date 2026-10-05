@@ -27,6 +27,14 @@ public class MoviesController(IMovieRepository repository) : ControllerBase
     //    return await dbContext.Movies.ToListAsync();
     //}
 
+    [HttpGet("{name}/{ascending}/{page}/{pageSize}")]
+    public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesFiltered(string name, bool ascending, int page, int pageSize)
+    {
+        var result = await repository.GetFilteredAsync(name, ascending, page, pageSize);
+
+        return result.Count == 0 ? NoContent() : Ok(result);
+    }
+
     // GET api/movies/5
     [HttpGet("{id}")]
     public ActionResult<Movie> GetMovie(int id)
