@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NoBeard.Learn.AspNet.WebApp.Data.Entities;
+using NoBeard.Learn.AspNet.WebApp.Data.Models;
 using NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
 namespace NoBeard.Learn.AspNet.WebApp.API.Controllers;
@@ -33,6 +34,13 @@ public class MoviesController(IMovieRepository repository) : ControllerBase
         var result = await repository.GetFilteredAsync(name, ascending, page, pageSize);
 
         return result.Count == 0 ? NoContent() : Ok(result);
+    }
+
+    [HttpGet("query")]
+    public async Task<ActionResult<QueryResult<Movie>>> GetMovies([FromQuery] QueryParameters parameters)
+    {
+        var result = await repository.GetAsync(parameters);
+        return result.Items.Count == 0 ? NoContent() : Ok(result);
     }
 
     // GET api/movies/5

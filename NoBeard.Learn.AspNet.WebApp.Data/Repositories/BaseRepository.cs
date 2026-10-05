@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NoBeard.Learn.AspNet.WebApp.Data.Entities;
+using NoBeard.Learn.AspNet.WebApp.Data.Models;
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
@@ -55,5 +56,39 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
 
         dbContext.Set<TEntity>().Remove(entity);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<QueryResult<TEntity>> GetAsync(QueryParameters parameters)
+    {
+        var query = dbContext.Set<TEntity>().AsQueryable();
+
+        // Apply filtering
+        if (!string.IsNullOrEmpty(parameters.Search))
+        {
+            query = query.Where(e => EF.Functions.Like(e.ToString(), $"%{parameters.Search}%"));
+        }
+        // Apply sorting
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            query = parameters.Descending
+                ? query.OrderByDescending(e => EF.Property<object>(e, parameters.SortBy))
+                : query.OrderBy(e => EF.Property<object>(e, parameters.SortBy));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        // Apply pagination
+        var items = await query
+            .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+            .Take(parameters.PageSize)
+            .ToListAsync();
+
+        return new QueryResult<TEntity>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = parameters.PageNumber,
+            PageSize = parameters.PageSize
+        };
     }
 }

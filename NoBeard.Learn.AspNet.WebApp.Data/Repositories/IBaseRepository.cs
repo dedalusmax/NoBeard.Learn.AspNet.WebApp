@@ -1,4 +1,5 @@
 ﻿using NoBeard.Learn.AspNet.WebApp.Data.Entities;
+using NoBeard.Learn.AspNet.WebApp.Data.Models;
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
@@ -13,4 +14,6 @@ public interface IBaseRepository<TEntity> where TEntity : class, IEntity
     Task UpdateAsync(TEntity entity);
 
     Task DeleteAsync(int id);
+
+    Task<QueryResult<TEntity>> GetAsync(QueryParameters parameters);
 }
