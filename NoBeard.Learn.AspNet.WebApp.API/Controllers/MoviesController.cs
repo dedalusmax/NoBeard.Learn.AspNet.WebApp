@@ -6,7 +6,7 @@ namespace NoBeard.Learn.AspNet.WebApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MoviesController(IMovieRepository repository) : ControllerBase
+public class MoviesController(IBaseRepository<Movie> repository) : ControllerBase
 {
     // GET: api/movies
     [HttpGet]
