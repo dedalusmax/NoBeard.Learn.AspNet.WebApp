@@ -2,15 +2,7 @@
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
-public interface IMovieRepository
+public interface IMovieRepository : IBaseRepository<Movie>
 {
-    Task<List<Movie>> GetAllAsync();
-    
-    Task<Movie?> GetByIdAsync(int id);
-
-    Task<int> CreateAsync(Movie movie);
-
-    Task UpdateAsync(Movie movie);
-
-    Task DeleteAsync(int id);
+    Task ActivateAsync(int id);
 }

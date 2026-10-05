@@ -1,53 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NoBeard.Learn.AspNet.WebApp.Data.Entities;
+﻿using NoBeard.Learn.AspNet.WebApp.Data.Entities;
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
-public sealed class MovieRepository(AppDbContext dbContext) : IMovieRepository
+public sealed class MovieRepository(AppDbContext dbContext) : BaseRepository<Movie>(dbContext), IMovieRepository
 {
-    public async Task<List<Movie>> GetAllAsync()
+    public async Task ActivateAsync(int id)
     {
-        return await dbContext.Set<Movie>().ToListAsync();
-    }
-
-    public async Task<Movie?> GetByIdAsync(int id)
-    {
-        return await dbContext.Movies.FindAsync(id);
-    }  
-    
-    public async Task<int> CreateAsync(Movie movie)
-    {
-        dbContext.Movies.Add(movie);
-        await dbContext.SaveChangesAsync();
-        return movie.Id;
-    }
-
-    public async Task UpdateAsync(Movie movie)
-    {
-        var entity = await GetByIdAsync(movie.Id);
+        var entity = await GetByIdAsync(id);
 
         if (entity is null)
         {
-            throw new InvalidOperationException($"Movie with ID {movie.Id} not found.");
+            throw new InvalidOperationException($"Movie with Id {id} not found.");
         }
 
-        entity.Name = movie.Name;
-        entity.Genre = movie.Genre;
-        entity.ReleaseYear = movie.ReleaseYear;
+        entity.IsActive = true;
 
-        await dbContext.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var movie = await GetByIdAsync(id);
-
-        if (movie is null)
-        {
-            throw new InvalidOperationException($"Movie with ID {id} not found.");
-        }
-
-        dbContext.Movies.Remove(movie);
+        dbContext.Movies.Update(entity);
         await dbContext.SaveChangesAsync();
     }
 }

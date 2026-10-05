@@ -13,4 +13,7 @@ public class Movie : IEntity
     public string Genre { get; set; }
 
     public short ReleaseYear { get; set; }
+    
+    [Required]
+    public bool IsActive { get; set; } = true;
 }

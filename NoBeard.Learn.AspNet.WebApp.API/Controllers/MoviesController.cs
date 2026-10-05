@@ -6,7 +6,7 @@ namespace NoBeard.Learn.AspNet.WebApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MoviesController(IBaseRepository<Movie> repository) : ControllerBase
+public class MoviesController(IMovieRepository repository) : ControllerBase
 {
     // GET: api/movies
     [HttpGet]
@@ -62,6 +62,22 @@ public class MoviesController(IBaseRepository<Movie> repository) : ControllerBas
         try
         {
             await repository.UpdateAsync(model);
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound();
+        }
+
+        return NoContent(); // Ok()
+    }
+
+    // PUT api/movies/5/active
+    [HttpPut("{id}/active")]
+    public async Task<ActionResult> Activate(int id)
+    {
+        try
+        {
+            await repository.ActivateAsync(id);
         }
         catch (InvalidOperationException)
         {
