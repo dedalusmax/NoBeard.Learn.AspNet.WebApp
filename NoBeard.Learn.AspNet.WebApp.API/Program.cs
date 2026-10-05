@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NoBeard.Learn.AspNet.WebApp.Data;
+using NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
 var app = builder.Build();
 

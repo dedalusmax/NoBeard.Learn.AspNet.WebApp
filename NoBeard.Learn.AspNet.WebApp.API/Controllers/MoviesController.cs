@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NoBeard.Learn.AspNet.WebApp.Data;
 using NoBeard.Learn.AspNet.WebApp.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
 namespace NoBeard.Learn.AspNet.WebApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MoviesController(AppDbContext dbContext) : ControllerBase
+public class MoviesController(IMovieRepository repository) : ControllerBase
 {
     // GET: api/movies
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAsync()
     {
-        var result = await dbContext.Movies.ToListAsync();
+        var result = await repository.GetAllAsync();
 
         if (result.Count == 0)
         {
@@ -32,7 +31,7 @@ public class MoviesController(AppDbContext dbContext) : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<Movie> GetMovie(int id)
     {
-        var movie = dbContext.Movies.Find(id);
+        var movie = repository.GetByIdAsync(id).Result;
 
         if (movie == null)
         {
@@ -46,10 +45,9 @@ public class MoviesController(AppDbContext dbContext) : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Post([FromBody] Movie movie)
     {
-        dbContext.Movies.Add(movie);
-        await dbContext.SaveChangesAsync();
+        var id = await repository.CreateAsync(movie);
 
-        return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
+        return CreatedAtAction("GetMovie", new { id }, movie);
     }
 
     // PUT api/movies/5
@@ -61,20 +59,14 @@ public class MoviesController(AppDbContext dbContext) : ControllerBase
             return BadRequest();
         }
 
-        var movie = await dbContext.Movies.FindAsync(id);
-
-        if (movie == null)
+        try
+        {
+            await repository.UpdateAsync(model);
+        }
+        catch (InvalidOperationException)
         {
             return NotFound();
         }
-
-        movie.Name = model.Name;
-        movie.Genre = model.Genre;
-        movie.ReleaseYear = model.ReleaseYear;
-
-        // dbContext.Entry(model).State = EntityState.Modified;
-
-        await dbContext.SaveChangesAsync();
 
         return NoContent(); // Ok()
     }
@@ -83,15 +75,14 @@ public class MoviesController(AppDbContext dbContext) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        var movie = await dbContext.Movies.FindAsync(id);
-
-        if (movie == null)
+        try
+        {
+            await repository.DeleteAsync(id);
+        }
+        catch (InvalidOperationException)
         {
             return NotFound();
         }
-
-        dbContext.Movies.Remove(movie);
-        await dbContext.SaveChangesAsync();
 
         return NoContent(); // Ok()
     }
