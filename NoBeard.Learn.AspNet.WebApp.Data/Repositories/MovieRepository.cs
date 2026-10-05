@@ -3,11 +3,11 @@ using NoBeard.Learn.AspNet.WebApp.Data.Entities;
 
 namespace NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
-public class MovieRepository(AppDbContext dbContext) : IMovieRepository
+public sealed class MovieRepository(AppDbContext dbContext) : IMovieRepository
 {
     public async Task<List<Movie>> GetAllAsync()
     {
-        return await dbContext.Movies.ToListAsync();
+        return await dbContext.Set<Movie>().ToListAsync();
     }
 
     public async Task<Movie?> GetByIdAsync(int id)
