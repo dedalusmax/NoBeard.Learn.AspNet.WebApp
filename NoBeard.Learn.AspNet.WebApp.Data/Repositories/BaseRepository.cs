@@ -58,15 +58,18 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         await dbContext.SaveChangesAsync();
     }
 
+    protected virtual IQueryable<TEntity> ApplyFilters(IQueryable<TEntity> query, QueryParameters parameters)
+    {
+        return query;
+    }
+
     public async Task<QueryResult<TEntity>> GetAsync(QueryParameters parameters)
     {
         var query = dbContext.Set<TEntity>().AsQueryable();
 
         // Apply filtering
-        if (!string.IsNullOrEmpty(parameters.Search))
-        {
-            query = query.Where(e => EF.Functions.Like(e.ToString(), $"%{parameters.Search}%"));
-        }
+        query = ApplyFilters(query, parameters);
+
         // Apply sorting
         if (!string.IsNullOrEmpty(parameters.SortBy))
         {

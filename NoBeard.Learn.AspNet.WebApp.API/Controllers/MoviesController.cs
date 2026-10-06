@@ -37,7 +37,7 @@ public class MoviesController(IMovieRepository repository) : ControllerBase
     }
 
     [HttpGet("query")]
-    public async Task<ActionResult<QueryResult<Movie>>> GetMovies([FromQuery] QueryParameters parameters)
+    public async Task<ActionResult<QueryResult<Movie>>> GetMovies([FromQuery] MovieQueryParameters parameters)
     {
         var result = await repository.GetAsync(parameters);
         return result.Items.Count == 0 ? NoContent() : Ok(result);
