@@ -1,23 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NoBeard.Learn.AspNet.WebApp.API.Controllers;
-using NoBeard.Learn.AspNet.WebApp.Data;
 using NoBeard.Learn.AspNet.WebApp.Data.Entities;
-using NoBeard.Learn.AspNet.WebApp.Data.Repositories;
 
 namespace NoBeard.Learn.AspNet.WebApp.UnitTests;
 
-public class MovieControllerTests
+public class MovieControllerTests(TestFixture fixture) : IClassFixture<TestFixture>
 {
     [Fact]
     public async Task TestMovieController_GetMovies_Ok()
     {
         // Arrange
-        var dbContext = new AppDbContext();
-        var repository = new MovieRepository(dbContext);
-        var controller = new MoviesController(repository);
 
         // Act
-        var result = await controller.GetAsync();
+        var result = await fixture.Controller.GetAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -39,12 +33,9 @@ public class MovieControllerTests
     public void TestMovieController_GetMovie_Ok(int movieId)
     {
         // Arrange
-        var dbContext = new AppDbContext();
-        var repository = new MovieRepository(dbContext);
-        var controller = new MoviesController(repository);
 
         // Act
-        var result = controller.GetMovie(movieId);
+        var result = fixture.Controller.GetMovie(movieId);
 
         // Assert
         Assert.NotNull(result);
@@ -64,12 +55,9 @@ public class MovieControllerTests
     public void TestMovieController_GetMovie_NotFound(int movieId)
     {
         // Arrange
-        var dbContext = new AppDbContext();
-        var repository = new MovieRepository(dbContext);
-        var controller = new MoviesController(repository);
 
         // Act
-        var result = controller.GetMovie(movieId);
+        var result = fixture.Controller.GetMovie(movieId);
 
         // Assert
         Assert.NotNull(result);
